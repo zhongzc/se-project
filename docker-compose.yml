@@ -1,33 +1,33 @@
-version: "3"
+version: '3'
+
 services:
-  front:
-    image: gaufoo/se-front
-    ports:
-      - "1234:80"
-    depends_on:
-      - "api"
-    restart: always
-  api:
+  se-api:
     image: gaufoo/se-api
     ports:
-      - "4567:4567"
-    environment:
-      - MYSQL_HOST=mysql
-      - MYSQL_USER=${DB_USER}
-      - MYSQL_PASSWORD=${DB_PASSWORD}
-      - MYSQL_DATABASE=${DB_DATABASE}
+      - '8500:8500'
     depends_on:
-      - "mysql"
-    restart: always
-  mysql:
-    image: mysql:5.7
-    ports:
-      - "3306:3306"
-    volumes:
-      - data
+      - 'se-db'
     environment:
-      - MYSQL_USER=${DB_USER}
-      - MYSQL_PASSWORD=${DB_PASSWORD}
-      - MYSQL_DATABASE=${DB_DATABASE}
-      - MYSQL_RANDOM_ROOT_PASSWORD=yes
+      WAIT_HOSTS: se-db:3306
     restart: always
+
+  se-front:
+    image: gaufoo/se-front
+    ports:
+      - '8000:80'
+    depends_on:
+      - 'se-api'
+    environment:
+      WAIT_HOSTS: se-db:3306
+    restart: always
+
+  se-db:
+    image: mysql:5.7
+    environment:
+      MYSQL_USER: rjgc
+      MYSQL_PASSWORD: rjgc123
+      MYSQL_DATABASE: rjgc7484
+      MYSQL_RANDOM_ROOT_PASSWORD: "yes"
+    command: ['mysqld', '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci']
+    restart: always
+
